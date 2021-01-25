@@ -1,8 +1,8 @@
-#include "string_helper.h"
+#include "../string_helper.h"
 
 #include <gtest/gtest.h>
 
-using namespace ucfg;
+using namespace ucfg::detail;
 
 TEST(ucfg, string) {
   std::string str{" x "};
