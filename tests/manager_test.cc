@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../manager.h"
+#include "../ucfg.h"
 
 TEST(ucfg, manager) {
   std::string test_filename{"test.cfg"};

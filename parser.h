@@ -57,13 +57,11 @@ Result Parser(std::istream& in_stream) {
   std::string section;
   while (std::getline(in_stream, line_str)) {
     ++line_num;
-    {
-      if (ucfg::detail::ParserSection(line_str, section)) {
-        // LOGGER_MULTI_TOKEN(line_num, "section",
-        // line_str.c_str(), section.c_str());
-        main_table.insert({section, {}});
-        continue;
-      }
+    if (ucfg::detail::ParserSection(line_str, section)) {
+      // LOGGER_MULTI_TOKEN(line_num, "section",
+      // line_str.c_str(), section.c_str());
+      main_table.insert({section, {}});
+      continue;
     }
 
     {
@@ -76,13 +74,11 @@ Result Parser(std::istream& in_stream) {
       }
     }
 
-    {
-      // TODO: Comments are not supported temporarily
-      if (ucfg::detail::ParserComment(line_str, comment)) {
-        // LOGGER_MULTI_TOKEN(line_num, "comment",
-        // line_str.c_str(), comment.c_str());
-        continue;
-      }
+    // TODO: Comments are not supported temporarily
+    if (ucfg::detail::ParserComment(line_str, comment)) {
+      // LOGGER_MULTI_TOKEN(line_num, "comment",
+      // line_str.c_str(), comment.c_str());
+      continue;
     }
 
     section = "";

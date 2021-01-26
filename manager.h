@@ -2,8 +2,7 @@
 // Created by fs on 2021-01-26.
 //
 
-#ifndef UCFG__MANAGER_H_
-#define UCFG__MANAGER_H_
+#pragma once
 
 #include "parser.h"
 
@@ -130,5 +129,3 @@ class Manager {
   }
 };
 }  // namespace ucfg
-
-#endif  // UCFG__MANAGER_H_
