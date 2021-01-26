@@ -94,7 +94,8 @@ Result Parser(std::istream& in_stream) {
 Result ParserFile(const std::string& filename) {
   std::ifstream ifs(filename.c_str(), std::ios_base::binary);
   if (!ifs.good()) {
-    throw std::runtime_error("parse: file open error -> " + filename);
+    std::string e{std::string(__FILE__) + ":" + std::to_string(__LINE__) + " "};
+    throw std::runtime_error(e + "parse: file open error -> " + filename);
   }
   return Parser(ifs);
 }
@@ -118,7 +119,9 @@ std::string Dump(const Result& map) {
 void DumpToFile(const std::string& filename, const Result& map) {
   std::ofstream ofs(filename.c_str(), std::ios_base::binary);
   if (!ofs.good()) {
-    throw std::runtime_error("dump to file: file open error -> " + filename);
+    std::string e{std::string(__FILE__) + ":" + std::to_string(__LINE__) + " "};
+    throw std::runtime_error(e + "dump to file: file open error -> " +
+                             filename);
   }
   ofs << Dump(map);
 }

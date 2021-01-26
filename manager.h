@@ -15,8 +15,14 @@ class Manager {
   Result data_;
 
  public:
-  Manager(const std::string& filename)
-      : filename_(filename), data_(ucfg::detail::ParserFile(filename)) {}
+  Manager(const std::string& filename, bool open = true)
+      : filename_(filename),
+        data_(open ? ucfg::detail::ParserFile(filename) : Result{}) {}
+
+  auto ReloadFile() -> decltype(*this) {
+    data_ = ucfg::detail::ParserFile(filename_);
+    return *this;
+  }
 
   template <typename T>
   void Visit(const T& visitor) const {
@@ -64,12 +70,12 @@ class Manager {
   }
 
   std::string GetString(const std::string& section, const std::string& key,
-                        const std::string& default_value) const {
+                        const std::string& default_value = "") const {
     return Contains(section, key) ? data_.at(section).at(key) : default_value;
   }
 
   long GetInteger(const std::string& section, const std::string& name,
-                  long default_value) const {
+                  long default_value = 0) const {
     std::string value_str = GetString(section, name, "");
     const char* value = value_str.c_str();
     char tmp, *end = &tmp;  // Any value other than nullptr
@@ -79,7 +85,7 @@ class Manager {
   }
 
   double GetDouble(const std::string& section, const std::string& key,
-                   double default_value) const {
+                   double default_value = 0) const {
     std::string value_str = GetString(section, key, "");
     const char* value = value_str.c_str();
     char tmp, *end = &tmp;  // Any value other than nullptr
@@ -87,8 +93,8 @@ class Manager {
     return end > value ? n : default_value;
   }
 
-  bool GetBoolean(const std::string& section, const std::string& key,
-                  bool default_value) const {
+  bool GetBool(const std::string& section, const std::string& key,
+                  bool default_value = false) const {
     std::string str = GetString(section, key, "");
     // Convert to lower case to make string comparisons case-insensitive
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
@@ -100,10 +106,19 @@ class Manager {
       return default_value;
   }
 
+  auto Clear() -> decltype(*this) {
+    data_.clear();
+    return *this;
+  }
+
   std::string Dump() const { return ::ucfg::detail::Dump(data_); }
-  void DumpToFile() const { ::ucfg::detail::DumpToFile(filename_, data_); }
-  void DumpToFile(const std::string& filename) const {
+  auto DumpToFile() const -> decltype(*this) {
+    ::ucfg::detail::DumpToFile(filename_, data_);
+    return *this;
+  }
+  auto DumpToFile(const std::string& filename) const -> decltype(*this) {
     ::ucfg::detail::DumpToFile(filename, data_);
+    return *this;
   }
 
  private:

@@ -25,9 +25,3 @@ TEST(ucfg, string) {
   EXPECT_EQ(strip("\r\n \t"), "");
   EXPECT_EQ(strip("\r\n "), "");
 }
-
-TEST(ucfg, string2) {
-  std::string str{" x "};
-  EXPECT_EQ(strip(str), "x");
-  EXPECT_EQ(strip(" x "), "x");
-}
