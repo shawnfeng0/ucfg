@@ -128,4 +128,5 @@ class Manager {
     return *this;
   }
 };
+
 }  // namespace ucfg

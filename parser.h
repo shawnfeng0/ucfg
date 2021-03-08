@@ -90,8 +90,7 @@ Result Parser(std::istream& in_stream) {
 Result ParserFile(const std::string& filename) {
   std::ifstream ifs(filename.c_str(), std::ios_base::binary);
   if (!ifs.good()) {
-    std::string e{std::string(__FILE__) + ":" + std::to_string(__LINE__) + " "};
-    throw std::runtime_error(e + "parse: file open error -> " + filename);
+    return Result{};
   }
   return Parser(ifs);
 }
