@@ -2,10 +2,9 @@
 // Created by fs on 2021-01-25.
 //
 
-#include "../parser.h"
-
 #include <gtest/gtest.h>
 
+#include "../parser.h"
 #include "../ucfg.h"
 
 TEST(ucfg, manager) {
@@ -13,24 +12,24 @@ TEST(ucfg, manager) {
 
   // Clear file
   {
-    auto manager = ucfg::Manager(test_filename, false);
-    manager.Clear().DumpToFile();
+    ucfg::Manager manager(test_filename, false);
+    manager.Clear().Save();
   }
 
   // Set key-value
   {
-    auto manager = ucfg::Manager(test_filename, false);
+    ucfg::Manager manager(test_filename, false);
     manager.SetInteger("values", "int_key", 1234);
     manager.SetDouble("values", "double_key", 1234.234);
     manager.SetBool("values", "bool_true_key", true);
     manager.SetBool("values", "bool_false_key", false);
     manager.SetString("values", "string_key", "This is a string.");
-    manager.DumpToFile();
+    manager.Save();
   }
 
   // Test key-value
   {
-    auto manager = ucfg::Manager(test_filename);
+    ucfg::Manager manager(test_filename);
     EXPECT_EQ(manager.GetInteger("values", "int_key"), 1234);
     EXPECT_EQ(manager.GetDouble("values", "double_key"), 1234.234);
     EXPECT_EQ(manager.GetBool("values", "bool_true_key"), true);
@@ -40,7 +39,7 @@ TEST(ucfg, manager) {
 
   // Dump test
   {
-    auto manager = ucfg::Manager(test_filename);
+    ucfg::Manager manager(test_filename);
     auto dump_data{manager.Dump()};
     EXPECT_EQ(dump_data, R"([values]
 bool_false_key = false

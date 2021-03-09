@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <mutex>
+
 #include "parser.h"
 
 namespace ucfg {
@@ -15,12 +17,15 @@ class Manager {
         data_(open ? ucfg::detail::ParserFile(filename) : Result{}) {}
 
   auto ReloadFile() -> decltype(*this) {
+    std::lock_guard<std::mutex> lg(lock_);
+
     data_ = ucfg::detail::ParserFile(filename_);
     return *this;
   }
 
   template <typename T>
   void Visit(const T& visitor) const {
+    std::lock_guard<std::mutex> lg(lock_);
     for (const auto& sections : data_)
       for (const auto& key_value : sections.second)
         visitor(sections.first, key_value.first, key_value.second);
@@ -28,45 +33,50 @@ class Manager {
 
   template <typename T>
   void Visit(const std::string& section, const T& visitor) const {
-    if (Contains(section))
+    std::lock_guard<std::mutex> lg(lock_);
+    if (data_.count(section) != 0) {
       for (const auto& j : data_.at(section)) visitor(j.first, j.second);
+    }
   }
 
   bool Contains(const std::string& section, const std::string& key) const {
+    std::lock_guard<std::mutex> lg(lock_);
     return data_.count(section) && data_.at(section).count(key);
   }
 
   bool Contains(const std::string& section) const {
+    std::lock_guard<std::mutex> lg(lock_);
     return data_.count(section) != 0;
   }
 
   auto SetString(const std::string& section, const std::string& key,
                  const std::string& value) -> decltype(*this) {
+    std::lock_guard<std::mutex> lg(lock_);
     data_[section][key] = value;
     return *this;
   }
 
   auto SetInteger(const std::string& section, const std::string& key,
                   long value) -> decltype(*this) {
-    SetString(section, key, std::to_string(value));
-    return *this;
+    return SetString(section, key, std::to_string(value));
   }
 
   auto SetDouble(const std::string& section, const std::string& key,
                  double value) -> decltype(*this) {
-    SetString(section, key, std::to_string(value));
-    return *this;
+    return SetString(section, key, std::to_string(value));
   }
 
   auto SetBool(const std::string& section, const std::string& key, bool value)
       -> decltype(*this) {
-    SetString(section, key, value ? "true" : "false");
-    return *this;
+    return SetString(section, key, value ? "true" : "false");
   }
 
   std::string GetString(const std::string& section, const std::string& key,
                         const std::string& default_value = "") const {
-    return Contains(section, key) ? data_.at(section).at(key) : default_value;
+    std::lock_guard<std::mutex> lg(lock_);
+    return (data_.count(section) && data_.at(section).count(key))
+               ? data_.at(section).at(key)
+               : default_value;
   }
 
   long GetInteger(const std::string& section, const std::string& name,
@@ -100,16 +110,24 @@ class Manager {
   }
 
   auto Clear() -> decltype(*this) {
+    std::lock_guard<std::mutex> lg(lock_);
     data_.clear();
     return *this;
   }
 
-  std::string Dump() const { return ::ucfg::detail::Dump(data_); }
-  auto DumpToFile() const -> decltype(*this) {
+  std::string Dump() const {
+    std::lock_guard<std::mutex> lg(lock_);
+    return ::ucfg::detail::Dump(data_);
+  }
+
+  auto Save() const -> decltype(*this) {
+    std::lock_guard<std::mutex> lg(lock_);
     ::ucfg::detail::DumpToFile(filename_, data_);
     return *this;
   }
-  auto DumpToFile(const std::string& filename) const -> decltype(*this) {
+
+  auto SaveTo(const std::string& filename) const -> decltype(*this) {
+    std::lock_guard<std::mutex> lg(lock_);
     ::ucfg::detail::DumpToFile(filename, data_);
     return *this;
   }
@@ -117,6 +135,7 @@ class Manager {
  private:
   const std::string filename_;
   Result data_;
+  mutable std::mutex lock_;
 };
 
 }  // namespace ucfg
