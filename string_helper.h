@@ -15,28 +15,28 @@ static constexpr char kDefaultStripChars[] = " \t\r\n";
  * Strip function, delete the specified characters on both sides of the string.
  */
 
-std::string &left_strip(std::string &s,
+inline std::string &left_strip(std::string &s,
                         const std::string &characters = kDefaultStripChars) {
   return s.erase(0, s.find_first_not_of(characters));
 }
 
-std::string left_strip(const std::string &s,
+inline std::string left_strip(const std::string &s,
                        const std::string &characters = kDefaultStripChars) {
   return std::string{s}.erase(0, s.find_first_not_of(characters));
 }
 
-std::string &right_strip(std::string &s,
+inline std::string &right_strip(std::string &s,
                          const std::string &characters = kDefaultStripChars) {
   return s.erase(s.find_last_not_of(characters) + 1);
 }
 
-std::string right_strip(const std::string &s,
+inline std::string right_strip(const std::string &s,
                         const std::string &characters = kDefaultStripChars) {
   return std::string{s}.erase(s.find_last_not_of(characters) + 1);
 }
 
 template <typename StrType>
-std::string strip(StrType &&s,
+inline std::string strip(StrType &&s,
                   const std::string &characters = kDefaultStripChars) {
   return right_strip(left_strip(std::forward<StrType>(s), characters),
                      characters);

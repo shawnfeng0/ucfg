@@ -49,7 +49,7 @@ inline bool ParserComment(const std::string& str, std::string& comment) {
   return true;
 }
 
-Result Parser(std::istream& in_stream) {
+inline Result Parser(std::istream& in_stream) {
   Result main_table;
   size_t line_num = 0;
   std::string line_str;
@@ -87,7 +87,7 @@ Result Parser(std::istream& in_stream) {
   return main_table;
 }
 
-Result ParserFile(const std::string& filename) {
+inline Result ParserFile(const std::string& filename) {
   std::ifstream ifs(filename.c_str(), std::ios_base::binary);
   if (!ifs.good()) {
     return Result{};
@@ -95,7 +95,7 @@ Result ParserFile(const std::string& filename) {
   return Parser(ifs);
 }
 
-std::string Dump(const Result& map) {
+inline std::string Dump(const Result& map) {
   std::string result;
   for (const auto& i : map) {
     if (i.first != "") {
@@ -111,7 +111,7 @@ std::string Dump(const Result& map) {
   return result;
 }
 
-void DumpToFile(const std::string& filename, const Result& map) {
+inline void DumpToFile(const std::string& filename, const Result& map) {
   std::ofstream ofs(filename.c_str(), std::ios_base::binary);
   if (!ofs.good()) {
     std::string e{std::string(__FILE__) + ":" + std::to_string(__LINE__) + " "};
