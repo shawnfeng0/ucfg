@@ -9,10 +9,6 @@
 namespace ucfg {
 
 class Manager {
- private:
-  const std::string filename_;
-  Result data_;
-
  public:
   Manager(const std::string& filename, bool open = true)
       : filename_(filename),
@@ -76,24 +72,22 @@ class Manager {
   long GetInteger(const std::string& section, const std::string& name,
                   long default_value = 0) const {
     std::string value_str = GetString(section, name, "");
-    const char* value = value_str.c_str();
-    char tmp, *end = &tmp;  // Any value other than nullptr
+    char* end;
     // This parses "1234" (decimal) and also "0x4D2" (hex)
-    long n = strtol(value, &end, 0);
-    return end > value ? n : default_value;
+    long n = strtol(value_str.c_str(), &end, 0);
+    return end > value_str.c_str() ? n : default_value;
   }
 
   double GetDouble(const std::string& section, const std::string& key,
                    double default_value = 0) const {
     std::string value_str = GetString(section, key, "");
-    const char* value = value_str.c_str();
-    char tmp, *end = &tmp;  // Any value other than nullptr
-    double n = strtod(value, &end);
-    return end > value ? n : default_value;
+    char* end;
+    double n = strtod(value_str.c_str(), &end);
+    return end > value_str.c_str() ? n : default_value;
   }
 
   bool GetBool(const std::string& section, const std::string& key,
-                  bool default_value = false) const {
+               bool default_value = false) const {
     std::string str = GetString(section, key, "");
     // Convert to lower case to make string comparisons case-insensitive
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
@@ -121,12 +115,8 @@ class Manager {
   }
 
  private:
-  // Hide
-  Result& get_data() { return data_; }
-  auto set_data(const Result& data) -> decltype(*this) {
-    if (&data != &data_) data_ = data;
-    return *this;
-  }
+  const std::string filename_;
+  Result data_;
 };
 
 }  // namespace ucfg
