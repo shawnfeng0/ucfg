@@ -45,15 +45,16 @@ inline std::string strip(StrType &&s,
 
 inline std::tuple<std::string, std::string> split_two_string(
     const std::string &str, const std::string &delimiter) {
+  using StringPair = std::tuple<std::string, std::string>;
   std::string left;
   std::string right;
   auto pos = str.find(delimiter);
   if (pos == std::string::npos) {
-    return {"", str};
+    return StringPair{"", str};
   }
   left = str.substr(0, pos);
   right = str.substr(pos + delimiter.length());
-  return {left, right};
+  return StringPair{left, right};
 }
 
 }  // namespace detail
