@@ -35,8 +35,9 @@ inline bool ParserPair(const std::string& str, std::string& key,
   if (pos == std::string::npos) {
     return false;
   }
-  key = strip(str.substr(0, pos - 0));
-  value = strip(pos != str.length() ? str.substr(pos + 1) : "", " \"");
+
+  key = strip(str.substr(0, pos));
+  value = strip(str.substr(pos + 1), " \"");
   return true;
 }
 
