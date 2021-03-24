@@ -110,6 +110,30 @@ class Manager {
       return default_value;
   }
 
+  bool IsNumber(const std::string& section, const std::string& key) const {
+    std::string str = GetString(section, key, "");
+    int dot_number = 0;
+    // All numbers
+    if (!str.empty() &&
+        str.size() == std::count_if(str.cbegin(), str.cend(),
+                                    [&](auto c) {
+                                      if (c == '.') dot_number++;
+                                      return std::isdigit(c) || c == '.';
+                                    }) &&
+        dot_number < 2) {
+      return true;
+    }
+    return false;
+  }
+
+  bool IsBoolean(const std::string& section, const std::string& key) const {
+    std::string str = GetString(section, key, "");
+    // Convert to lower case to make string comparisons case-insensitive
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    if (str == "true" || str == "false") return true;
+    return false;
+  }
+
   auto Clear() -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
     data_.clear();
