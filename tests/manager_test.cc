@@ -7,18 +7,46 @@
 #include "../parser.h"
 #include "../ucfg.h"
 
+using namespace ucfg;
+using namespace ucfg::detail;
+
+TEST(ucfg, default_config) {
+  std::string cfg_filename{"test.cfg"};
+  std::string default_filename{"default.cfg"};
+
+  Result res1 = ParserFile(default_filename);
+  std::cout << Dump(res1) << std::endl;
+
+  std::cout << std::string(20, '-') << std::endl;
+
+  Result res2 = ParserFile(cfg_filename);
+  std::cout << Dump(res2) << std::endl;
+
+  std::cout << std::string(20, '-') << std::endl;
+
+  res1.merge_new(res2);
+
+  std::cout << Dump(res1) << std::endl;
+}
+
+void printIt(const std::map<int, int>& m) {
+  for (auto& it : m) std::cout << it.first << ":" << it.second << " ";
+  std::cout << "\n";
+}
+
 TEST(ucfg, manager) {
-  std::string test_filename{"test.cfg"};
+  std::string cfg_filename{"test.cfg"};
+  std::string default_filename{"default.cfg"};
 
   // Clear file
   {
-    ucfg::Manager manager(test_filename, false);
+    ucfg::Manager manager(cfg_filename);
     manager.Clear().Save();
   }
 
   // Set key-value
   {
-    ucfg::Manager manager(test_filename, false);
+    ucfg::Manager manager(cfg_filename);
     manager.SetInteger("values", "int_key", 1234);
     manager.SetDouble("values", "double_key", 1234.234);
     manager.SetBool("values", "bool_true_key", true);
@@ -29,7 +57,7 @@ TEST(ucfg, manager) {
 
   // Test key-value
   {
-    ucfg::Manager manager(test_filename);
+    ucfg::Manager manager(cfg_filename);
     EXPECT_EQ(manager.GetInteger("values", "int_key"), 1234);
     EXPECT_EQ(manager.GetDouble("values", "double_key"), 1234.234);
     EXPECT_EQ(manager.GetBool("values", "bool_true_key"), true);
@@ -39,7 +67,7 @@ TEST(ucfg, manager) {
 
   // Dump test
   {
-    ucfg::Manager manager(test_filename);
+    ucfg::Manager manager(cfg_filename);
     auto dump_data{manager.Dump()};
     EXPECT_EQ(dump_data, R"([values]
 bool_false_key = false

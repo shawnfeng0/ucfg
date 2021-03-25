@@ -15,7 +15,20 @@
 
 namespace ucfg {
 
-using Result = std::map<std::string, std::map<std::string, std::string>>;
+class Result
+    : public std::map<std::string, std::map<std::string, std::string>> {
+ public:
+  Result& merge_new(const Result& r) {
+    for (const auto& i : r) {
+      // Use the [] operator, add it if it does not exist
+      auto& section = this->operator[](i.first);
+      for (const auto& j : i.second) {
+        section[j.first] = j.second;
+      }
+    }
+    return *this;
+  }
+};
 
 namespace detail {
 
