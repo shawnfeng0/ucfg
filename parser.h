@@ -108,7 +108,9 @@ inline std::string Dump(const Result& map) {
     }
     result += "\n";
   }
-  result.pop_back();
+  if (!result.empty()) {
+    result.pop_back();
+  }
   return result;
 }
 
