@@ -15,10 +15,10 @@
 
 namespace ucfg {
 
-class Result
+class ConfigData
     : public std::map<std::string, std::map<std::string, std::string>> {
  public:
-  Result& merge_new(const Result& r) {
+  ConfigData& merge_new(const ConfigData& r) {
     for (const auto& i : r) {
       // Use the [] operator, add it if it does not exist
       auto& section = this->operator[](i.first);
@@ -63,8 +63,8 @@ inline bool ParserComment(const std::string& str, std::string& comment) {
   return true;
 }
 
-inline Result Parser(std::istream& in_stream) {
-  Result main_table;
+inline ConfigData Parser(std::istream& in_stream) {
+  ConfigData main_table;
   size_t line_num = 0;
   std::string line_str;
   std::string comment;
@@ -101,15 +101,15 @@ inline Result Parser(std::istream& in_stream) {
   return main_table;
 }
 
-inline Result ParserFile(const std::string& filename) {
+inline ConfigData ParserFile(const std::string& filename) {
   std::ifstream ifs(filename.c_str(), std::ios_base::binary);
   if (!ifs.good()) {
-    return Result{};
+    return ConfigData{};
   }
   return Parser(ifs);
 }
 
-inline std::string Dump(const Result& map) {
+inline std::string Dump(const ConfigData& map) {
   std::string result;
   for (const auto& i : map) {
     if (i.first != "") {
@@ -127,7 +127,7 @@ inline std::string Dump(const Result& map) {
   return result;
 }
 
-inline void DumpToFile(const std::string& filename, const Result& map) {
+inline void DumpToFile(const std::string& filename, const ConfigData& map) {
   std::ofstream ofs(filename.c_str(), std::ios_base::binary);
   if (!ofs.good()) {
     std::string e{std::string(__FILE__) + ":" + std::to_string(__LINE__) + " "};

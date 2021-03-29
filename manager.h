@@ -11,24 +11,18 @@
 
 namespace ucfg {
 
-class Manager {
+class ConfigManager {
  public:
-  Manager(const std::string& filename, const std::string& default_filename)
-      : filename_(filename),
-        default_data_(ucfg::detail::ParserFile(default_filename)),
-        data_(Result(default_data_)
-                  .merge_new(ucfg::detail::ParserFile(filename))) {}
-
-  Manager(const std::string& filename, const Result& default_data = {})
-      : filename_(filename),
-        default_data_(default_data),
-        data_(Result(default_data_)
-                  .merge_new(ucfg::detail::ParserFile(filename))) {}
+  ConfigManager(const std::string& filename,
+                const ConfigData& default_data = {})
+      : filename_(filename), default_data_(ConfigData(default_data)) {
+    data_ = ConfigData(default_data_).merge_new(detail::ParserFile(filename));
+  }
 
   auto ReloadFile() -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
-    data_ =
-        Result(default_data_).merge_new(ucfg::detail::ParserFile(filename_));
+    data_ = ConfigData(default_data_)
+                .merge_new(ucfg::detail::ParserFile(filename_));
     return *this;
   }
 
@@ -165,11 +159,16 @@ class Manager {
     return *this;
   }
 
+  ConfigData get_data() const {
+    std::lock_guard<std::mutex> lg(lock_);
+    return data_;
+  }
+
  private:
+  mutable std::mutex lock_{};
   const std::string filename_;
-  const Result default_data_;
-  Result data_;
-  mutable std::mutex lock_;
+  const ConfigData default_data_;
+  ConfigData data_;
 };
 
 }  // namespace ucfg
