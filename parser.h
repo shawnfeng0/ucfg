@@ -32,34 +32,34 @@ class ConfigData
 
 namespace detail {
 
-inline bool ParserSection(const std::string& str, std::string& out) {
+inline bool ParserSection(const std::string& str, std::string* out) {
   const auto begin = str.find('[');
   const auto end = str.rfind(']');
   if (begin == std::string::npos || end == std::string::npos) {
     return false;
   }
-  out = strip(str.substr(begin, end), " []");
+  if (out) *out = strip(str.substr(begin, end), " []");
   return true;
 }
 
-inline bool ParserPair(const std::string& str, std::string& key,
-                       std::string& value) {
+inline bool ParserPair(const std::string& str, std::string* key,
+                       std::string* value) {
   auto pos = str.find('=');
   if (pos == std::string::npos) {
     return false;
   }
 
-  key = strip(str.substr(0, pos));
-  value = strip(str.substr(pos + 1), " \"");
+  if (key) *key = strip(str.substr(0, pos));
+  if (value) *value = strip(str.substr(pos + 1), " \"");
   return true;
 }
 
-inline bool ParserComment(const std::string& str, std::string& comment) {
+inline bool ParserComment(const std::string& str, std::string* comment) {
   auto pos = str.find_first_of("#;");
   if (pos == std::string::npos) {
     return false;
   }
-  comment = pos != str.length() ? str.substr(pos + 1) : "";
+  if (comment) *comment = pos != str.length() ? str.substr(pos + 1) : "";
   return true;
 }
 
@@ -71,7 +71,7 @@ inline ConfigData Parser(std::istream& in_stream) {
   std::string section;
   while (std::getline(in_stream, line_str)) {
     ++line_num;
-    if (ucfg::detail::ParserSection(line_str, section)) {
+    if (ucfg::detail::ParserSection(line_str, &section)) {
       // LOGGER_MULTI_TOKEN(line_num, "section",
       // line_str.c_str(), section.c_str());
       main_table.insert({section, {}});
@@ -80,7 +80,7 @@ inline ConfigData Parser(std::istream& in_stream) {
 
     {
       std::string key, value;
-      if (ucfg::detail::ParserPair(line_str, key, value)) {
+      if (ucfg::detail::ParserPair(line_str, &key, &value)) {
         // LOGGER_MULTI_TOKEN(line_num, "key-value",
         // line_str.c_str(), key.c_str(), value.c_str());
         main_table[section].emplace(key, value);
@@ -89,7 +89,7 @@ inline ConfigData Parser(std::istream& in_stream) {
     }
 
     // TODO: Comments are not supported temporarily
-    if (ucfg::detail::ParserComment(line_str, comment)) {
+    if (ucfg::detail::ParserComment(line_str, &comment)) {
       // LOGGER_MULTI_TOKEN(line_num, "comment",
       // line_str.c_str(), comment.c_str());
       continue;
