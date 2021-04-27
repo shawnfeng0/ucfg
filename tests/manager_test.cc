@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "../parser.h"
-#include "../ucfg.h"
+#include "ucfg/parser.h"
+#include "ucfg/ucfg.h"
 
 using namespace ucfg;
 using namespace ucfg::detail;
