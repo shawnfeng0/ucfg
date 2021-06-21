@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
 project(ucfg)
 
-option(BUILD_TESTS "Build tests" OFF)
+option(UCFG_BUILD_TESTS "Build tests" ON)
 
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories(include)
+add_library(${PROJECT_NAME} INTERFACE)
+target_include_directories(${PROJECT_NAME} INTERFACE include)
 
-if (BUILD_TESTS)
+if (UCFG_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif ()
