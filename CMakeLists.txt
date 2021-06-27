@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(ucfg)
 
-option(UCFG_BUILD_TESTS "Build tests" ON)
+option(UCFG_BUILD_TESTS "Build tests" OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 
