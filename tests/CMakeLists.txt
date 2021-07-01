@@ -47,7 +47,6 @@ link_libraries(Threads::Threads)
 # test source
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} TEST_SOURCE)
 add_executable(unit_tests ${TEST_SOURCE})
-target_include_directories(unit_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(unit_tests PRIVATE ucfg)
+target_link_libraries(unit_tests PRIVATE ucfg ucfg_param)
 
 add_test(cmake_unit_test ${CMAKE_CURRENT_BINARY_DIR}/unit_tests)

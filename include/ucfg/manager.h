@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <mutex>
+#include <utility>
 
 #include "parser.h"
 
@@ -13,17 +14,14 @@ namespace ucfg {
 
 class ConfigManager {
  public:
-  ConfigManager(const std::string& filename,
-                const ConfigData& default_data = {})
-      : filename_(filename), default_data_(ConfigData(default_data)) {
-    data_ = ConfigData(default_data_).merge_new(detail::ParserFile(filename));
+  explicit ConfigManager(std::string filename, ConfigData default_data = {})
+      : filename_(std::move(filename)), default_data_(std::move(default_data)) {
+    ReloadFile();
   }
 
   auto ReloadFile() -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
-    data_ = ConfigData(default_data_)
-                .merge_new(ucfg::detail::ParserFile(filename_));
-    return *this;
+    return LoadFileLocked();
   }
 
   template <typename T>
@@ -165,6 +163,12 @@ class ConfigManager {
   }
 
  private:
+  auto LoadFileLocked() -> decltype(*this) {
+    data_ = ConfigData(default_data_)
+                .merge_new(ucfg::detail::ParserFile(filename_));
+    return *this;
+  }
+
   mutable std::mutex lock_{};
   const std::string filename_;
   const ConfigData default_data_;

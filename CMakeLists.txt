@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD 14)
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE include)
 
+add_library(${PROJECT_NAME}_param src/param/param.cc src/param/param_default_data.cc)
+target_include_directories(${PROJECT_NAME}_param PUBLIC include)
+
 if (UCFG_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
