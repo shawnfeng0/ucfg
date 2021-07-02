@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(ucfg)
 
 option(UCFG_BUILD_TESTS "Build tests" OFF)
+option(UCFG_BUILD_EXAMPLES "Build examples" OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -22,4 +23,8 @@ install(FILES ${UCFG_PARAM_HEADERS} DESTINATION include/ucfg/param)
 if (UCFG_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif ()
+
+if (UCFG_BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif ()
