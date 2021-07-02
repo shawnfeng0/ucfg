@@ -17,10 +17,6 @@ struct ucfg_manager *ucfg_create_manager(
   }
 }
 
-void ucfg_destroy_manager(struct ucfg_manager *manager) {
-  delete reinterpret_cast<ucfg::ConfigManager *>(manager);
-}
-
 void ucfg_erase_all(struct ucfg_manager *manager) {
   if (!manager) return;
 
