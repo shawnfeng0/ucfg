@@ -22,6 +22,6 @@ jobs:
     - name: Build and run tests
       run: |
         mkdir -p build && cd build
-        cmake -DBUILD_TESTS=ON ..
+        cmake -DUCFG_BUILD_TESTS=ON ..
         make unit_tests
         ./tests/unit_tests
