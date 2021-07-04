@@ -5,11 +5,12 @@ option(UCFG_BUILD_TESTS "Build tests" OFF)
 option(UCFG_BUILD_EXAMPLES "Build examples" OFF)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_C_STANDARD 99)
 
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE include)
 
-add_library(${PROJECT_NAME}_param src/param/param.cc src/param/param_default_data.cc)
+add_library(${PROJECT_NAME}_param src/param/param.cc)
 target_include_directories(${PROJECT_NAME}_param PUBLIC include)
 
 # install

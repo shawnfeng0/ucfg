@@ -39,7 +39,7 @@ TEST(ucfg, manager) {
     manager.Clear().Save();
   }
 
-  // Set key-value
+  // Set key_-value_
   {
     ucfg::ConfigManager manager(cfg_filename);
     manager.SetInteger("values", "int_key", 1234);
@@ -50,7 +50,7 @@ TEST(ucfg, manager) {
     manager.Save();
   }
 
-  // Test key-value
+  // Test key_-value_
   {
     ucfg::ConfigManager manager(cfg_filename);
     EXPECT_EQ(manager.GetInteger("values", "int_key"), 1234);

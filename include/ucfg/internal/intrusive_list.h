@@ -19,7 +19,7 @@ class ListNode {
 template <class T>
 class List {
  public:
-  bool Add(T new_node) {
+  bool Add(T new_node) noexcept {
     if (!new_node) {
       return false;
     }
@@ -28,7 +28,7 @@ class List {
     return true;
   }
 
-  bool Remove(T remove_node) {
+  bool Remove(T remove_node) noexcept {
     if (!remove_node || !head_) {
       return false;
     }
@@ -69,22 +69,22 @@ class List {
   Iterator end() { return Iterator(nullptr); }
   Iterator end() const { return Iterator(nullptr); }
 
-  bool empty() const { return head_ == nullptr; }
+  bool empty() const noexcept { return head_ == nullptr; }
 
-  unsigned size() const {
+  unsigned size() const noexcept {
     unsigned sz = 0;
     for (auto node : *this) sz++;
     return sz;
   }
 
-  void DeleteNode(T node) {
+  void DeleteNode(T node) noexcept {
     if (Remove(node)) {
       // only delete if node was successfully removed
       delete node;
     }
   }
 
-  void DeleteAllNode() {
+  void DeleteAllNode() noexcept {
     while (head_) {
       auto next = head_->get_next();
       delete head_;
