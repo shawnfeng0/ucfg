@@ -116,7 +116,7 @@ class ConfigManager {
     // All numbers
     if (!str.empty() &&
         str.size() == std::count_if(str.cbegin(), str.cend(),
-                                    [&](auto c) {
+                                    [&](char c) {
                                       if (c == '.') dot_number++;
                                       return std::isdigit(c) || c == '.';
                                     }) &&

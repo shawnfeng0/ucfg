@@ -76,7 +76,7 @@ void ucfg_save_float(ucfg_manager *manager, const char *key, float value);
  */
 #define UCFG_DEFINE_PARAM_MANAGER(manager, file_path)                         \
   static ucfg::DefaultDataList UCFG_DEFAULT_DATA(manager);                    \
-  UCFG_EXPORT ucfg_manager *UCFG_ID(manager) {                         \
+  UCFG_EXPORT ucfg_manager *UCFG_ID(manager) {                                \
     static auto *manager_ = reinterpret_cast<ucfg_manager *>(                 \
         new ucfg::ConfigManager(file_path, ucfg::ConvertDefault2Config(       \
                                                UCFG_DEFAULT_DATA(manager)))); \
@@ -108,7 +108,7 @@ void ucfg_save_float(ucfg_manager *manager, const char *key, float value);
 #endif  // __cplusplus
 
 #define UCFG_DECLARE_PARAM_MANAGER(manager)                                    \
-  UCFG_EXPORT ucfg_manager *UCFG_ID(manager);                           \
+  UCFG_EXPORT ucfg_manager *UCFG_ID(manager);                                  \
   static inline void manager##_erase_all() {                                   \
     ucfg_erase_all(UCFG_ID(manager));                                          \
   }                                                                            \

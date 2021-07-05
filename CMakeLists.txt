@@ -4,7 +4,7 @@ project(ucfg)
 option(UCFG_BUILD_TESTS "Build tests" OFF)
 option(UCFG_BUILD_EXAMPLES "Build examples" OFF)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD 99)
 
 add_library(${PROJECT_NAME} INTERFACE)
