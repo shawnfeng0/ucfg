@@ -15,11 +15,13 @@ target_include_directories(${PROJECT_NAME}_param PUBLIC include)
 
 # install
 file(GLOB UCFG_HEADERS include/ucfg/*.h)
-file(GLOB UCFG_PARAM_HEADERS include/ucfg/param/*.h)
 install(TARGETS ${PROJECT_NAME}_param
         ARCHIVE DESTINATION lib)
 install(FILES ${UCFG_HEADERS} DESTINATION include/ucfg)
+file(GLOB UCFG_PARAM_HEADERS include/ucfg/param/*.h)
 install(FILES ${UCFG_PARAM_HEADERS} DESTINATION include/ucfg/param)
+file(GLOB UCFG_INTERNAL_HEADERS include/ucfg/internal/*.h)
+install(FILES ${UCFG_INTERNAL_HEADERS} DESTINATION include/ucfg/internal)
 
 if (UCFG_BUILD_TESTS)
     enable_testing()
