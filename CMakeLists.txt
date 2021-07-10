@@ -7,6 +7,8 @@ option(UCFG_BUILD_EXAMPLES "Build examples" OFF)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD 99)
 
+add_compile_options(-Wextra -Wall)
+
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE include)
 

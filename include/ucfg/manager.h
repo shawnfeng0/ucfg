@@ -115,11 +115,12 @@ class ConfigManager {
     int dot_number = 0;
     // All numbers
     if (!str.empty() &&
-        str.size() == std::count_if(str.cbegin(), str.cend(),
-                                    [&](char c) {
-                                      if (c == '.') dot_number++;
-                                      return std::isdigit(c) || c == '.';
-                                    }) &&
+        str.size() == static_cast<std::size_t>(
+                          std::count_if(str.cbegin(), str.cend(),
+                                        [&](char c) {
+                                          if (c == '.') dot_number++;
+                                          return std::isdigit(c) || c == '.';
+                                        })) &&
         dot_number < 2) {
       return true;
     }
