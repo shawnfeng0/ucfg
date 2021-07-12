@@ -4,40 +4,24 @@
 //
 #pragma once
 
-#include "ucfg/internal/intrusive_list.h"
-#include "ucfg/param/param_default_data.h"
 #include "ucfg/ucfg.h"
 
 namespace ucfg {
 
-class DefaultDataNode : public internal::ListNode<DefaultDataNode *> {
- private:
+struct DefaultDataNode {
   union Value {
-    explicit Value(bool value) : bool_value(value){};
-    explicit Value(int value) : int_value(value){};
-    explicit Value(float value) : float_value(value){};
-    explicit Value(const char *value) : string_value(value){};
     bool bool_value;
     int int_value;
     float float_value;
     const char *string_value;
   };
 
- public:
   enum Type {
     t_bool,
     t_int,
     t_float,
     t_string,
   };
-  DefaultDataNode(const char *key, bool value) noexcept
-      : key_(key), type_(t_bool), value_{value} {}
-  DefaultDataNode(const char *key, int value) noexcept
-      : key_(key), type_(t_int), value_{value} {}
-  DefaultDataNode(const char *key, float value) noexcept
-      : key_(key), type_(t_float), value_{value} {}
-  DefaultDataNode(const char *key, const char *value) noexcept
-      : key_(key), type_(t_string), value_(value) {}
 
   Type get_type() const { return type_; }
   const char *get_key() const { return key_; }
@@ -46,18 +30,17 @@ class DefaultDataNode : public internal::ListNode<DefaultDataNode *> {
   float as_float() const { return value_.float_value; }
   const char *as_string() const { return value_.string_value; }
 
- private:
   const char *key_;
   enum Type type_;
   union Value value_;
 };
 
-using DefaultDataList = internal::List<DefaultDataNode *>;
-
-static inline ConfigData ConvertDefault2Config(
-    const DefaultDataList &data_list) {
+static inline ConfigData ConvertDefault2Config(const DefaultDataNode *begin,
+                                               const DefaultDataNode *end) {
+  static_assert(std::is_trivial<ucfg::DefaultDataNode>::value,
+                "Not a trivial struct.");
   ConfigData result;
-  for (auto node : data_list) {
+  for (auto node = begin; node < end; node++) {
     std::string section, name;
     std::tie(section, name) =
         ucfg::detail::split_two_string(node->get_key(), "-");

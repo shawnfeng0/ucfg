@@ -3,31 +3,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/*
-# Config File example:
-
-[database]
-file = payroll.dat
-port = 143
-server = 192.0.2.62
-
-
-# Set param:
-
-ucfg_save_int("database-port", 143);
-ucfg_save_string("database-server", "192.0.2.62");
-// use...
-
-
-# Get param:
-
-int port = ucfg_get_int("database-port", 120);
-char server[16];
-ucfg_get_string("database-port", "", server, sizeof(server));
-// use...
-
-*/
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -63,36 +38,46 @@ void ucfg_save_float(ucfg_manager *manager, const char *key, float value);
 #define UCFG_EXPORT
 #endif
 
-#define UCFG_DEFAULT_DATA(manager_name) default_data##manager_name
 #define UCFG_ID(manager_name) ucfg_##manager_name()
+
+#define UCFG_DEFAULT_DATA_SECTION(manager) ucfg_default_data_##manager
+
+// __attribute((__used__)) Prevent being optimized
+#define UCFG_SECTION_DECLARE_(section) \
+  __attribute((__section__(#section))) __attribute((__used__))
+#define UCFG_SECTION_DECLARE(section) UCFG_SECTION_DECLARE_(section)
+
+#define UCFG_CAT_(a, b) a##b
+#define UCFG_CAT(a, b) UCFG_CAT_(a, b)
+#define UCFG_SECTION_BEGIN(section) \
+  UCFG_CAT(__start_, UCFG_DEFAULT_DATA_SECTION(section))
+#define UCFG_SECTION_END(section) \
+  UCFG_CAT(__stop_, UCFG_DEFAULT_DATA_SECTION(section))
 
 #ifdef __cplusplus
 #include "param_default_data.h"
 
-/**
- * ucfg::DefaultDataList uses static variables and ucfg_manager uses functions
- * to delay initialization of ucfg_manager to ensure that ucfg::DefaultDataList
- * has been set.
- */
+// ucfg_manager uses functions to delay initialization of ucfg_manager
 #define UCFG_DEFINE_PARAM_MANAGER(manager, file_path)                         \
-  static ucfg::DefaultDataList UCFG_DEFAULT_DATA(manager);                    \
+  extern struct ucfg::DefaultDataNode UCFG_SECTION_BEGIN(manager);            \
+  extern struct ucfg::DefaultDataNode UCFG_SECTION_END(manager);              \
   UCFG_EXPORT ucfg_manager *UCFG_ID(manager) {                                \
     static auto *manager_ = reinterpret_cast<ucfg_manager *>(                 \
         new ucfg::ConfigManager(file_path, ucfg::ConvertDefault2Config(       \
-                                               UCFG_DEFAULT_DATA(manager)))); \
+                                               &UCFG_SECTION_BEGIN(manager),  \
+                                               &UCFG_SECTION_END(manager)))); \
     return manager_;                                                          \
   }                                                                           \
   struct hack
 
-#define UCFG_CAT_(a, b) a##b
-#define UCFG_CAT(a, b) UCFG_CAT_(a, b)
-#define UCFG_UNIQUE_NAME UCFG_CAT(ucfg, __LINE__)
-
-#define UCFG_DEFINE_PARAM(manager, type, section, name, default_value) \
-  static ucfg::DefaultDataNode default_data_node_##section##_##name(   \
-      #section "-" #name, (type)(default_value));                      \
-  static auto UCFG_UNIQUE_NAME =                                       \
-      UCFG_DEFAULT_DATA(manager).Add(&default_data_node_##section##_##name)
+#define UCFG_DEFINE_PARAM(manager, type, section, name, default_value)        \
+  static struct ucfg::DefaultDataNode _ucfg_register_##manager##section##name \
+  UCFG_SECTION_DECLARE(UCFG_DEFAULT_DATA_SECTION(manager)) {                  \
+    .key_ = #section "-" #name, .type_ = (ucfg::DefaultDataNode::t_##type),   \
+    .value_ {                                                                 \
+      .UCFG_CAT(type, _value) = (default_value)                               \
+    }                                                                         \
+  }
 
 #define UCFG_DEFINE_PARAM_BOOL(manager, section, name, default_value) \
   UCFG_DEFINE_PARAM(manager, bool, section, name, default_value)
@@ -103,7 +88,7 @@ void ucfg_save_float(ucfg_manager *manager, const char *key, float value);
 
 // Use (default_value "") to make sure it must be a literal string
 #define UCFG_DEFINE_PARAM_STRING(manager, section, name, default_value) \
-  UCFG_DEFINE_PARAM(manager, const char *, section, name, default_value "")
+  UCFG_DEFINE_PARAM(manager, string, section, name, default_value "")
 
 #endif  // __cplusplus
 
