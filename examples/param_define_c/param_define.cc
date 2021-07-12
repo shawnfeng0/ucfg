@@ -1,7 +1,7 @@
 //
 // Created by shawnfeng on 7/2/21.
 //
-#include "ucfg/param/param.h"
+#include <ucfg/param/param.h>
 
 // Define a parameter manager
 UCFG_DEFINE_PARAM_MANAGER(param, "./param.cfg");

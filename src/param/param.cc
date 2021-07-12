@@ -1,6 +1,5 @@
-#include "ucfg/param/param.h"
-
-#include "ucfg/ucfg.h"
+#include <ucfg/param/param.h>
+#include <ucfg/ucfg.h>
 
 void ucfg_erase_all(ucfg_manager *manager) {
   if (!manager) return;

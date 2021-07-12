@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "ucfg/ucfg.h"
+#include <ucfg/ucfg.h>
 
 namespace ucfg {
 

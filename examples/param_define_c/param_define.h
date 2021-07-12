@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "ucfg/param/param.h"
+#include <ucfg/param/param.h>
 
 // Declare parameter
 UCFG_DECLARE_PARAM_MANAGER(param);
