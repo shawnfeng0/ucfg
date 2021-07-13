@@ -7,9 +7,19 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/ShawnFeng0/ucfg/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ShawnFeng0/ucfg/compare/v0.2.0...HEAD
 
-## [0.1.0] - 2021-7-10
+## [0.2.0] - 2021-7-13
+
+[0.2.0]: https://github.com/ShawnFeng0/ucfg/releases/tag/v0.1.0...v0.2.0
+
+### Changed
+
+- Use gcc's `__attribute((__section__()))` attribute to implement the definition of parameter default values, replacing
+  the original linked list implementation, so that the reliability of the parameters can be guaranteed before main()
+  starts. But it does rely on GCC, at the expense of portability .
+
+## [0.1.0] - 2021-7-12
 
 [0.1.0]: https://github.com/ShawnFeng0/ucfg/releases/tag/v0.1.0
 
