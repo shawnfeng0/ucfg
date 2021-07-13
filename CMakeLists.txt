@@ -13,7 +13,7 @@ add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE include)
 
 add_library(${PROJECT_NAME}_param src/param/param.cc)
-target_include_directories(${PROJECT_NAME}_param PUBLIC include)
+target_link_libraries(${PROJECT_NAME}_param PUBLIC ${PROJECT_NAME})
 
 # install
 install(TARGETS ${PROJECT_NAME}_param
