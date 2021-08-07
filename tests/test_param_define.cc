@@ -6,8 +6,12 @@
 
 #include "param_define.h"
 
-TEST(ucfg, param_set) {
+TEST(ucfg, param) {
   param_save_s1_test(true);
-  std::cout << "Param: " << param_get_s1_test() << std::endl;
-  std::cout << "Param: " << param_get_s3_test() << std::endl;
+  EXPECT_EQ(param_get_s1_test(), true);
+
+  param_save_s1_test(false);
+  EXPECT_EQ(param_get_s1_test(), false);
+
+
 }

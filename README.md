@@ -82,8 +82,8 @@ UCFG_DECLARE_PARAM_STRING(param, server, domain);
 #include "param_define.h"
 
 int main() {
-	char server[100];
-	param_get_server_domain(server, sizeof(server));
+    char server[100];
+    param_get_server_domain(server, sizeof(server));
     printf("server domain -> %s", server);
     
     param_save_server_domain("www.unknown.com");
@@ -95,9 +95,14 @@ int main() {
     param_save_control_max_speed(20);
     printf("expected: 20, control_max_speed -> %d", param_get_control_max_speed());
 }
+
 ```
 
 具体可参考[examples](examples)文件夹中的例子.
+
+### 外部实时修改文件参数（谨慎使用）
+
+在文件中修改完参数保存后，参数管理器会根据文件的修改时间刷新内部参数，从而达到实时修改参数的目的。
 
 ## 相关技术
 

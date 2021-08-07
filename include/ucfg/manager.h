@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <sys/stat.h>
+
 #include <algorithm>
 #include <mutex>
 #include <utility>
@@ -11,6 +13,30 @@
 #include "parser.h"
 
 namespace ucfg {
+
+static bool GetFileModifiedTime(const std::string& filename,
+                                struct timespec* modified_time) {
+  struct stat st {};
+  if (stat(filename.c_str(), &st) == 0) {
+    if (modified_time) {
+      *modified_time = st.st_mtim;
+    }
+    return true;
+  }
+  return false;
+}
+
+static bool IsFileUpdate(const std::string& filename,
+                         const struct timespec& last_modified_time) {
+  struct timespec m_time {};
+  if (GetFileModifiedTime(filename, &m_time)) {
+    if (last_modified_time.tv_sec != m_time.tv_sec ||
+        last_modified_time.tv_nsec != m_time.tv_nsec) {
+      return true;
+    }
+  }
+  return false;
+}
 
 class ConfigManager {
  public:
@@ -22,6 +48,15 @@ class ConfigManager {
   auto ReloadFile() -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
     return LoadFileLocked();
+  }
+
+  auto ReloadFileIfUpdate() -> decltype(*this) {
+    std::lock_guard<std::mutex> lg(lock_);
+    if (IsFileUpdate(filename_, last_modified_time_)) {
+      return LoadFileLocked();
+    } else {
+      return *this;
+    }
   }
 
   template <typename T>
@@ -146,9 +181,10 @@ class ConfigManager {
     return ::ucfg::detail::Dump(data_);
   }
 
-  auto Save() const -> decltype(*this) {
+  auto Save() -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
     ::ucfg::detail::DumpToFile(filename_, data_);
+    GetFileModifiedTime(filename_, &last_modified_time_);
     return *this;
   }
 
@@ -167,11 +203,15 @@ class ConfigManager {
   auto LoadFileLocked() -> decltype(*this) {
     data_ = ConfigData(default_data_)
                 .merge_new(ucfg::detail::ParserFile(filename_));
+    GetFileModifiedTime(filename_, &last_modified_time_);
     return *this;
   }
 
   mutable std::mutex lock_{};
+
   const std::string filename_;
+  struct timespec last_modified_time_ {};
+
   const ConfigData default_data_;
   ConfigData data_;
 };
