@@ -24,16 +24,15 @@
   UCFG_CAT(__stop_, UCFG_DEFAULT_DATA_SECTION(section))
 
 // ucfg_manager uses functions to delay initialization of ucfg_manager
-#define UCFG_DEFINE_PARAM_MANAGER(manager, file_path)                         \
-  extern const struct ucfg::DefaultDataNode *UCFG_SECTION_BEGIN(manager);     \
-  extern const struct ucfg::DefaultDataNode *UCFG_SECTION_END(manager);       \
-  UCFG_EXPORT ucfg_manager *UCFG_ID(manager) {                                \
-    static auto *manager_ = reinterpret_cast<ucfg_manager *>(                 \
-        new ucfg::ConfigManager(file_path, ucfg::ConvertDefault2Config(       \
-                                               &UCFG_SECTION_BEGIN(manager),  \
-                                               &UCFG_SECTION_END(manager)))); \
-    return manager_;                                                          \
-  }                                                                           \
+#define UCFG_DEFINE_PARAM_MANAGER(manager, file_path)                        \
+  UCFG_EXPORT ucfg_manager *UCFG_ID(manager) {                               \
+    extern const struct ucfg::DefaultDataNode *UCFG_SECTION_BEGIN(manager);  \
+    extern const struct ucfg::DefaultDataNode *UCFG_SECTION_END(manager);    \
+    static ucfg::ConfigManager manager_(                                     \
+        file_path, ucfg::ConvertDefault2Config(&UCFG_SECTION_BEGIN(manager), \
+                                               &UCFG_SECTION_END(manager))); \
+    return reinterpret_cast<ucfg_manager *>(&manager_);                      \
+  }                                                                          \
   struct hack
 
 #define UCFG_DEFINE_PARAM(manager, type, section, name, default_value)    \
