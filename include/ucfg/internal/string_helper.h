@@ -1,5 +1,5 @@
 //
-// Created by fs on 1/25/21.
+// Created by shawnfeng on 2021/1/25.
 //
 
 #pragma once
@@ -8,7 +8,7 @@
 #include <tuple>
 
 namespace ucfg {
-namespace detail {
+namespace internal {
 
 static constexpr char kDefaultStripChars[] = " \t\r\n";
 
@@ -57,5 +57,5 @@ inline std::tuple<std::string, std::string> split_two_string(
   return StringPair{left, right};
 }
 
-}  // namespace detail
+}  // namespace internal
 }  // namespace ucfg

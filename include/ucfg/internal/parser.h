@@ -1,36 +1,14 @@
 //
-// Created by fs on 1/25/21.
+// Created by shawnfeng on 1/25/21.
 //
 
-#ifndef UCFG__PARSER_H_
-#define UCFG__PARSER_H_
+#pragma once
 
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <string>
-#include <unordered_map>
-
-#include "string_helper.h"
+#include <ucfg/config_data.h>
+#include <ucfg/internal/string_helper.h>
 
 namespace ucfg {
-
-class ConfigData
-    : public std::map<std::string, std::map<std::string, std::string>> {
- public:
-  ConfigData& merge_new(const ConfigData& r) {
-    for (const auto& i : r) {
-      // Use the [] operator, add it if it does not exist
-      auto& section = this->operator[](i.first);
-      for (const auto& j : i.second) {
-        section[j.first] = j.second;
-      }
-    }
-    return *this;
-  }
-};
-
-namespace detail {
+namespace internal {
 
 inline bool ParserSection(const std::string& str, std::string* out) {
   const auto begin = str.find('[');
@@ -71,7 +49,7 @@ inline ConfigData Parser(std::istream& in_stream) {
   std::string section;
   while (std::getline(in_stream, line_str)) {
     ++line_num;
-    if (ucfg::detail::ParserSection(line_str, &section)) {
+    if (ucfg::internal::ParserSection(line_str, &section)) {
       // LOGGER_MULTI_TOKEN(line_num, "section",
       // line_str.c_str(), section.c_str());
       main_table.insert({section, {}});
@@ -80,7 +58,7 @@ inline ConfigData Parser(std::istream& in_stream) {
 
     {
       std::string key, value;
-      if (ucfg::detail::ParserPair(line_str, &key, &value)) {
+      if (ucfg::internal::ParserPair(line_str, &key, &value)) {
         // LOGGER_MULTI_TOKEN(line_num, "key-value",
         // line_str.c_str(), key.c_str(), value.c_str());
         main_table[section].emplace(key, value);
@@ -89,7 +67,7 @@ inline ConfigData Parser(std::istream& in_stream) {
     }
 
     // TODO: Comments are not supported temporarily
-    if (ucfg::detail::ParserComment(line_str, &comment)) {
+    if (ucfg::internal::ParserComment(line_str, &comment)) {
       // LOGGER_MULTI_TOKEN(line_num, "comment",
       // line_str.c_str(), comment.c_str());
       continue;
@@ -112,7 +90,7 @@ inline ConfigData ParserFile(const std::string& filename) {
 inline std::string Dump(const ConfigData& map) {
   std::string result;
   for (const auto& i : map) {
-    if (i.first != "") {
+    if (!i.first.empty()) {
       result += "[" + i.first + "]";
     }
     result += "\n";
@@ -137,7 +115,5 @@ inline void DumpToFile(const std::string& filename, const ConfigData& map) {
   ofs << Dump(map);
 }
 
-}  // namespace detail
+}  // namespace internal
 }  // namespace ucfg
-
-#endif  // UCFG__PARSER_H_

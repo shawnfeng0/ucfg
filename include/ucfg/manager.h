@@ -1,47 +1,26 @@
 //
-// Created by fs on 2021-01-26.
+// Created by shawnfeng on 2021-01-26.
 //
 
 #pragma once
 
 #include <sys/stat.h>
+#include <ucfg/config_data.h>
+#include <ucfg/internal/file.h>
+#include <ucfg/internal/file_storage.h>
+#include <ucfg/internal/parser.h>
 
 #include <algorithm>
 #include <mutex>
 #include <utility>
 
-#include "parser.h"
-
 namespace ucfg {
-
-static bool GetFileModifiedTime(const std::string& filename,
-                                struct timespec* modified_time) {
-  struct stat st {};
-  if (stat(filename.c_str(), &st) == 0) {
-    if (modified_time) {
-      *modified_time = st.st_mtim;
-    }
-    return true;
-  }
-  return false;
-}
-
-static bool IsFileUpdate(const std::string& filename,
-                         const struct timespec& last_modified_time) {
-  struct timespec m_time {};
-  if (GetFileModifiedTime(filename, &m_time)) {
-    if (last_modified_time.tv_sec != m_time.tv_sec ||
-        last_modified_time.tv_nsec != m_time.tv_nsec) {
-      return true;
-    }
-  }
-  return false;
-}
 
 class ConfigManager {
  public:
-  explicit ConfigManager(std::string filename, ConfigData default_data = {})
-      : filename_(std::move(filename)), default_data_(std::move(default_data)) {
+  explicit ConfigManager(const std::string& filename,
+                         ConfigData default_data = {})
+      : file_storage_(filename), default_data_(std::move(default_data)) {
     ReloadFile();
   }
 
@@ -52,7 +31,7 @@ class ConfigManager {
 
   auto ReloadFileIfUpdate() -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
-    if (IsFileUpdate(filename_, last_modified_time_)) {
+    if (file_storage_.IsModifiedByExternal()) {
       return LoadFileLocked();
     } else {
       return *this;
@@ -178,19 +157,18 @@ class ConfigManager {
 
   std::string Dump() const {
     std::lock_guard<std::mutex> lg(lock_);
-    return ::ucfg::detail::Dump(data_);
+    return internal::Dump(data_);
   }
 
   auto Save() -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
-    ::ucfg::detail::DumpToFile(filename_, data_);
-    GetFileModifiedTime(filename_, &last_modified_time_);
+    file_storage_.SaveData(data_);
     return *this;
   }
 
   auto SaveTo(const std::string& filename) const -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
-    ::ucfg::detail::DumpToFile(filename, data_);
+    internal::DumpToFile(filename, data_);
     return *this;
   }
 
@@ -201,16 +179,13 @@ class ConfigManager {
 
  private:
   auto LoadFileLocked() -> decltype(*this) {
-    data_ = ConfigData(default_data_)
-                .merge_new(ucfg::detail::ParserFile(filename_));
-    GetFileModifiedTime(filename_, &last_modified_time_);
+    data_ = ConfigData(default_data_).merge_new(file_storage_.LoadData());
     return *this;
   }
 
   mutable std::mutex lock_{};
 
-  const std::string filename_;
-  struct timespec last_modified_time_ {};
+  internal::FileStorage file_storage_;
 
   const ConfigData default_data_;
   ConfigData data_;

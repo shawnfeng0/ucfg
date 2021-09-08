@@ -1,14 +1,14 @@
 //
-// Created by fs on 2021-01-25.
+// Created by shawnfeng on 2021-01-25.
 //
 
 #include <gtest/gtest.h>
-
-#include "ucfg/parser.h"
-#include "ucfg/ucfg.h"
+#include <ucfg/config_data.h>
+#include <ucfg/internal/parser.h>
+#include <ucfg/ucfg.h>
 
 using namespace ucfg;
-using namespace ucfg::detail;
+using namespace ucfg::internal;
 
 TEST(ucfg, default_config) {
   std::string cfg_filename{"test.cfg"};

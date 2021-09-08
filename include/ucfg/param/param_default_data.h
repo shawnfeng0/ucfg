@@ -36,7 +36,7 @@ static inline ConfigData ConvertDefault2Config(const DefaultDataNode **begin,
   for (auto node = begin; node < end; node++) {
     std::string section, name;
     std::tie(section, name) =
-        ucfg::detail::split_two_string((*node)->key_, "-");
+        ucfg::internal::split_two_string((*node)->key_, "-");
     switch ((*node)->type_) {
       case DefaultDataNode::t_bool: {
         result[section][name] = (*node)->value_.bool_value ? "true" : "false";

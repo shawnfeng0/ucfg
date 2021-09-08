@@ -1,8 +1,8 @@
-#include "ucfg/string_helper.h"
-
 #include <gtest/gtest.h>
+#include <ucfg/internal/file.h>
+#include <ucfg/internal/string_helper.h>
 
-using namespace ucfg::detail;
+using namespace ucfg::internal;
 
 TEST(ucfg, string) {
   std::string str{" x "};
@@ -43,4 +43,33 @@ TEST(ucfg, string) {
   std::tie(section, key) = split_two_string("audio-volume", "-");
   EXPECT_EQ(section, "audio");
   EXPECT_EQ(key, "volume");
+}
+
+TEST(ucfg, file) {
+  std::string directory;
+  std::string basename;
+
+  std::tie(directory, basename) = SplitFilename("/etc/ucfg/test.param");
+  EXPECT_EQ(directory, "/etc/ucfg");
+  EXPECT_EQ(basename, "test.param");
+
+  std::tie(directory, basename) = SplitFilename("etc/ucfg/test.param");
+  EXPECT_EQ(directory, "etc/ucfg");
+  EXPECT_EQ(basename, "test.param");
+
+  std::tie(directory, basename) = SplitFilename("test.param");
+  EXPECT_EQ(directory, ".");
+  EXPECT_EQ(basename, "test.param");
+
+  std::tie(directory, basename) = SplitFilename("/test.param");
+  EXPECT_EQ(directory, "");
+  EXPECT_EQ(basename, "test.param");
+
+  std::tie(directory, basename) = SplitFilename("/test.param");
+  EXPECT_EQ(directory, "");
+  EXPECT_EQ(basename, "test.param");
+
+  std::tie(directory, basename) = SplitFilename("/test.param/");
+  EXPECT_EQ(directory, "/test.param");
+  EXPECT_EQ(basename, "");
 }

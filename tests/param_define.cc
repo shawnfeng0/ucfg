@@ -4,7 +4,7 @@
 
 #include "param_define.h"
 
-#include "ucfg/param/param.h"
+#include <ucfg/param/param.h>
 
 UCFG_DEFINE_PARAM_MANAGER(param, "./param.cfg");
 UCFG_DEFINE_PARAM_BOOL(param, s1, test, true);

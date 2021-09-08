@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "ucfg/param/param.h"
+#include <ucfg/param/param.h>
 
 UCFG_DECLARE_PARAM_MANAGER(param);
 UCFG_DECLARE_PARAM_BOOL(param, s1, test);
