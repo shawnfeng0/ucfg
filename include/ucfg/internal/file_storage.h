@@ -29,6 +29,14 @@ class FileStorage {
   explicit FileStorage(const std::string& filename) {
     std::tie(file_directory_, file_basename_) =
         internal::SplitFilename(filename);
+
+    auto temp_filename = TempFilename();
+
+    // If there are only temporary files. This situation occurred when the power
+    // was cut off unexpectedly during the last save.
+    if (!PathExists(filename) && PathExists(temp_filename)) {
+      RenameFile(temp_filename, filename);
+    }
   }
 
   bool IsModifiedByExternal() {
@@ -39,12 +47,6 @@ class FileStorage {
     auto filename = Filename();
     auto temp_filename = TempFilename();
 
-    // If there are only temporary files. This situation occurred when the power
-    // was cut off unexpectedly during the last save.
-    if (!PathExists(filename) && PathExists(temp_filename)) {
-      RenameFile(temp_filename, filename);
-    }
-
     DumpToFile(temp_filename, data);
     RenameFile(temp_filename, filename);
 
@@ -53,13 +55,6 @@ class FileStorage {
 
   ConfigData LoadData() {
     auto filename = Filename();
-    auto temp_filename = TempFilename();
-
-    // If there are only temporary files. This situation occurred when the power
-    // was cut off unexpectedly during the last save.
-    if (!PathExists(filename) && PathExists(temp_filename)) {
-      RenameFile(temp_filename, filename);
-    }
 
     auto data = ParserFile(filename);
     GetFileModifiedTime(filename, &last_modified_time_);
