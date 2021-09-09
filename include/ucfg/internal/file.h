@@ -28,11 +28,7 @@ static inline std::string DirName(const std::string &path) {
   return pos != std::string::npos ? path.substr(0, pos) : std::string{};
 }
 
-// Return directory name from given path or empty string
-// "abc/file" => "abc"
-// "abc/" => "abc"
-// "abc" => ""
-// "abc///" => "abc//"
+// Split file path is directory name and basename
 static inline std::tuple<std::string, std::string> SplitFilename(
     const std::string &path) {
   using StringPair = std::tuple<std::string, std::string>;
