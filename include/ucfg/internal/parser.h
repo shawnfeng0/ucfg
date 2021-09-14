@@ -4,8 +4,12 @@
 
 #pragma once
 
+#include <fcntl.h>
 #include <ucfg/config_data.h>
 #include <ucfg/internal/string_helper.h>
+#include <unistd.h>
+
+#include <fstream>
 
 namespace ucfg {
 namespace internal {
@@ -105,14 +109,29 @@ inline std::string Dump(const ConfigData& map) {
   return result;
 }
 
-inline void DumpToFile(const std::string& filename, const ConfigData& map) {
-  std::ofstream ofs(filename.c_str(), std::ios_base::binary);
-  if (!ofs.good()) {
+inline void DumpSyncToFile(const std::string& filename, const ConfigData& map) {
+  auto fd = open(filename.c_str(), O_RDWR | O_CREAT | O_TRUNC,
+                 S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+
+  if (fd < 0) {
     std::string e{std::string(__FILE__) + ":" + std::to_string(__LINE__) + " "};
     throw std::runtime_error(e + "dump to file: file open error -> " +
                              filename);
   }
-  ofs << Dump(map);
+
+  std::string data = Dump(map);
+
+  auto ret = write(fd, data.data(), data.size());
+
+  if (data.size() != static_cast<std::string::size_type>(ret)) {
+    close(fd);
+    std::string e{std::string(__FILE__) + ":" + std::to_string(__LINE__) + " "};
+    throw std::runtime_error(e + "dump to file: file write error -> " +
+                             filename);
+  }
+
+  fsync(fd);
+  close(fd);
 }
 
 }  // namespace internal

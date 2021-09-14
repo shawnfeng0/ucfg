@@ -47,7 +47,7 @@ class FileStorage {
     auto filename = Filename();
     auto temp_filename = TempFilename();
 
-    DumpToFile(temp_filename, data);
+    DumpSyncToFile(temp_filename, data);
     RenameFile(temp_filename, filename);
 
     internal::GetFileModifiedTime(filename, &last_modified_time_);

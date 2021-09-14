@@ -168,7 +168,7 @@ class ConfigManager {
 
   auto SaveTo(const std::string& filename) const -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
-    internal::DumpToFile(filename, data_);
+    internal::DumpSyncToFile(filename, data_);
     return *this;
   }
 
