@@ -5,7 +5,7 @@ void ucfg_erase_all(ucfg_manager *manager) {
   if (!manager) return;
 
   auto ucfg_manager = reinterpret_cast<ucfg::ConfigManager *>(manager);
-  ucfg_manager->Clear().Save();
+  ucfg_manager->RestoreDefault().Save();
 }
 
 void ucfg_get_string(ucfg_manager *manager, const char *key,

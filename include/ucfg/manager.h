@@ -149,9 +149,9 @@ class ConfigManager {
     return false;
   }
 
-  auto Clear() -> decltype(*this) {
+  auto RestoreDefault() -> decltype(*this) {
     std::lock_guard<std::mutex> lg(lock_);
-    data_.clear();
+    data_ = default_data_;
     return *this;
   }
 

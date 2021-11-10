@@ -36,7 +36,7 @@ TEST(ucfg, manager) {
   // Clear file
   {
     ucfg::ConfigManager manager(cfg_filename);
-    manager.Clear().Save();
+    manager.RestoreDefault().Save();
   }
 
   // Set key_-value_
